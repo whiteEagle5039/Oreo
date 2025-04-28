@@ -1,6 +1,8 @@
 <?php
 namespace App\Core;
 
+use App\Core\Connect;
+
 class AutoView
 {
     private $templates;
@@ -20,20 +22,32 @@ class AutoView
         if (!$this->viewExists($view)) {
             die("Vue '$view' non trouvée.");
         }
-
+    
         $template = $this->templates[$view];
-        $html = "<h1>" . ucfirst($view) . "</h1>";
-        $html .= "<form method='POST'>";
-
+        $html = "<!DOCTYPE html>\n";
+        $html .= "<html lang=\"fr\">\n";
+        $html .= "<head>\n";
+        $html .= "    <meta charset=\"UTF-8\">\n";
+        $html .= "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n";
+        $html .= "    <title>" . ucfirst($view) . "</title>\n";
+        $html .= "</head>\n";
+        $html .= "<body>\n";
+        
+        $html .= "<h1>" . ucfirst($view) . "</h1>\n";
+        $html .= "<form method=\"POST\">\n";
+        
         foreach ($template['inputs'] as $input) {
-            $html .= "<label>" . ucfirst($input) . "</label><br>";
-            $html .= "<input type='text' name='$input' required><br><br>";
+            $html .= "    <label for=\"$input\">" . ucfirst($input) . "</label><br>\n";
+            $html .= "    <input type=\"text\" id=\"$input\" name=\"$input\" required><br><br>\n";
         }
-
-        $html .= "<button type='submit'>Envoyer</button>";
-        $html .= "</form>";
-
-        echo $html;
+        
+        $html .= "    <button type=\"submit\">Envoyer</button>\n";
+        $html .= "</form>\n";
+        
+        $html .= "</body>\n";
+        $html .= "</html>";
+        
+        return $html;  
     }
 
     public function handleForm($view)
@@ -60,11 +74,12 @@ class AutoView
             }
         }
     }
+    
 
     private function handleLogin($data, $redirect)
     {
         // Connexion à la base de données
-        $db = new \PDO('mysql:host=localhost;dbname=oreo_db', 'root', '');
+        $db = Connect::getConnection();
 
         $stmt = $db->prepare("SELECT * FROM users WHERE email = :email AND password = :password");
         $stmt->execute([
@@ -73,7 +88,7 @@ class AutoView
         ]);
 
         if ($stmt->fetch()) {
-            header("Location: /public/index.php?view=$redirect");
+            header("Location: /$redirect");
             exit();
         } else {
             echo "<p style='color:red;'>Identifiants incorrects</p>";
@@ -82,7 +97,7 @@ class AutoView
 
     private function handleSignin($data, $redirect)
     {
-        $db = new \PDO('mysql:host=localhost;dbname=oreo_db', 'root', '');
+        $db = Connect::getConnection();
 
         $fields = implode(", ", array_keys($data));
         $placeholders = ":" . implode(", :", array_keys($data));
