@@ -1,0 +1,9 @@
+#!/usr/bin/env php
+<?php
+// Fichier exécutable de commande Oreo
+
+require __DIR__ . '/vendor/autoload.php';
+
+use System\Console\OreoCommand;
+
+OreoCommand::handle($argv);

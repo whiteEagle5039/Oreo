@@ -1,0 +1,9 @@
+{
+    "name": "oreo/framework",
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "System\\": "system/"
+        }
+    }
+}
